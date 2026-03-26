@@ -1,0 +1,310 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { BarChart3, Download, LogOut, Trophy } from "lucide-react";
+import { signOut } from "next-auth/react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { QuizBuilder } from "@/components/admin/quiz-builder";
+import { Table, TD, TH } from "@/components/ui/table";
+import { formatDate } from "@/lib/utils";
+
+type QuizRow = {
+  id: string;
+  title: string;
+  description: string;
+  isActive: boolean;
+  createdAt: string;
+  content: Record<string, unknown>;
+  questions: Array<{
+    id: string;
+    questionText: string;
+    options: string[];
+    correctAnswer: number;
+    explanation?: string | null;
+    order: number;
+  }>;
+};
+
+type SubmissionRow = {
+  id: string;
+  name: string;
+  storeNumber: string;
+  submissionDate: string;
+  score: number;
+  createdAt: string;
+};
+
+type Analytics = {
+  totalSubmissions: number;
+  averageScore: number;
+  completionByStore: Array<{ storeNumber: string; count: number; averageScore: number }>;
+  leaderboard: Array<{ storeNumber: string; score: number; name: string }>;
+};
+
+export function AdminDashboard({
+  initialQuizzes,
+  initialSubmissions,
+  initialAnalytics,
+}: {
+  initialQuizzes: QuizRow[];
+  initialSubmissions: SubmissionRow[];
+  initialAnalytics: Analytics;
+}) {
+  const [quizzes, setQuizzes] = useState(initialQuizzes);
+  const [selectedQuiz, setSelectedQuiz] = useState<QuizRow | null>(initialQuizzes[0] ?? null);
+  const [submissions, setSubmissions] = useState(initialSubmissions);
+  const [analytics, setAnalytics] = useState(initialAnalytics);
+  const [filters, setFilters] = useState({ storeNumber: "", startDate: "", endDate: "", minScore: "" });
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  async function refresh() {
+    const [quizResponse, submissionResponse, analyticsResponse] = await Promise.all([
+      fetch("/api/admin/quizzes"),
+      fetch(
+        `/api/admin/submissions?storeNumber=${filters.storeNumber}&startDate=${filters.startDate}&endDate=${filters.endDate}&minScore=${filters.minScore || ""}&page=${page}&pageSize=${pageSize}`,
+      ),
+      fetch("/api/admin/analytics"),
+    ]);
+
+    const [quizData, submissionData, analyticsData] = await Promise.all([
+      quizResponse.json(),
+      submissionResponse.json(),
+      analyticsResponse.json(),
+    ]);
+
+    setQuizzes(quizData.quizzes);
+    setSelectedQuiz((current) => quizData.quizzes.find((quiz: QuizRow) => quiz.id === current?.id) ?? quizData.quizzes[0] ?? null);
+    setSubmissions(submissionData.submissions);
+    setAnalytics(analyticsData);
+  }
+
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  async function activateQuiz(id: string) {
+    await fetch(`/api/admin/quizzes/${id}/activate`, { method: "POST" });
+    refresh();
+  }
+
+  async function deleteQuiz(id: string) {
+    await fetch(`/api/admin/quizzes/${id}`, { method: "DELETE" });
+    refresh();
+  }
+
+  async function exportPdf() {
+    setExportError(null);
+    const response = await fetch(
+      `/api/admin/submissions/export?storeNumber=${filters.storeNumber}&startDate=${filters.startDate}&endDate=${filters.endDate}&minScore=${filters.minScore || ""}`,
+    );
+    if (!response.ok) {
+      const message = await response.text();
+      setExportError(message || "Unable to export PDF.");
+      return;
+    }
+
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/pdf")) {
+      setExportError("Export did not return a PDF file.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "submission-report.pdf";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="rounded-[32px] bg-[linear-gradient(135deg,_#1e293b,_#0f172a)] p-6 text-white">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <Badge className="bg-white/15 text-white">Admin Panel</Badge>
+            <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
+            <p className="mt-2 max-w-3xl text-sm text-slate-300">
+              Create launch modules, keep exactly one quiz active, review completion rates, and export store-level reports.
+            </p>
+          </div>
+          <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10" onClick={() => signOut({ callbackUrl: "/admin/login" })}>
+            <LogOut className="mr-2 size-4" /> Sign out
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-6">
+          <Card className="p-5">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-[24px] bg-slate-50 p-4">
+                <p className="text-sm text-slate-500">Total submissions</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.totalSubmissions}</p>
+              </div>
+              <div className="rounded-[24px] bg-slate-50 p-4">
+                <p className="text-sm text-slate-500">Average score</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.averageScore}%</p>
+              </div>
+              <div className="rounded-[24px] bg-slate-50 p-4">
+                <p className="flex items-center gap-2 text-sm text-slate-500">
+                  <BarChart3 className="size-4" /> Stores tracked
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.completionByStore.length}</p>
+              </div>
+              <div className="rounded-[24px] bg-slate-50 p-4">
+                <p className="flex items-center gap-2 text-sm text-slate-500">
+                  <Trophy className="size-4" /> Top store
+                </p>
+                <p className="mt-2 text-lg font-semibold text-slate-950">{analytics.leaderboard[0]?.storeNumber ?? "No data"}</p>
+              </div>
+            </div>
+          </Card>
+
+          <QuizBuilder key={selectedQuiz?.id || "new-module"} initialValue={selectedQuiz} onSaved={refresh} />
+        </div>
+
+        <div className="space-y-6">
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Launch Modules</h2>
+            <div className="mt-4 space-y-3">
+              <Button
+                type="button"
+                onClick={() =>
+                  setSelectedQuiz({
+                    id: "",
+                    title: "",
+                    description: "",
+                    isActive: false,
+                    createdAt: new Date().toISOString(),
+                    content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "New launch content" }] }] },
+                    questions: [{ id: "", questionText: "", options: ["", ""], correctAnswer: 0, explanation: "", order: 1 }],
+                  })
+                }
+              >
+                Create New Module
+              </Button>
+              {quizzes.map((quiz) => (
+                <div key={quiz.id} className="rounded-[24px] border border-slate-200 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-slate-900">{quiz.title}</h3>
+                        {quiz.isActive ? <Badge>Active</Badge> : null}
+                      </div>
+                      <p className="mt-1 text-sm text-slate-500">{quiz.description}</p>
+                      <p className="mt-2 text-xs uppercase tracking-[0.16em] text-slate-400">Created {formatDate(quiz.createdAt)}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button type="button" variant="secondary" size="sm" onClick={() => setSelectedQuiz(quiz)}>
+                      Edit
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => activateQuiz(quiz.id)}>
+                      Set active
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => deleteQuiz(quiz.id)}>
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Submission Filters</h2>
+                <p className="text-sm text-slate-500">Filter and export completion reports.</p>
+              </div>
+              <Button type="button" variant="outline" onClick={exportPdf}>
+                <Download className="mr-2 size-4" /> Export PDF
+              </Button>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Input placeholder="Store number" value={filters.storeNumber} onChange={(event) => setFilters((current) => ({ ...current, storeNumber: event.target.value }))} />
+              <Input type="number" placeholder="Minimum score" value={filters.minScore} onChange={(event) => setFilters((current) => ({ ...current, minScore: event.target.value }))} />
+              <Input type="date" value={filters.startDate} onChange={(event) => setFilters((current) => ({ ...current, startDate: event.target.value }))} />
+              <Input type="date" value={filters.endDate} onChange={(event) => setFilters((current) => ({ ...current, endDate: event.target.value }))} />
+            </div>
+            <div className="mt-4">
+              <Button
+                type="button"
+                onClick={() => {
+                  setPage(1);
+                  refresh();
+                }}
+              >
+                Apply Filters
+              </Button>
+            </div>
+            {exportError ? <p className="mt-3 text-sm text-red-600">{exportError}</p> : null}
+          </Card>
+
+          <Card className="overflow-hidden">
+            <div className="border-b border-slate-200 px-5 py-4">
+              <h2 className="text-lg font-semibold text-slate-900">Recent Submissions</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <thead className="bg-slate-50">
+                  <tr>
+                    <TH>Name</TH>
+                    <TH>Store</TH>
+                    <TH>Date</TH>
+                    <TH>Score</TH>
+                    <TH>Completed</TH>
+                  </tr>
+                </thead>
+                <tbody>
+                  {submissions.map((submission) => (
+                    <tr key={submission.id} className="border-t border-slate-100">
+                      <TD>{submission.name}</TD>
+                      <TD>{submission.storeNumber}</TD>
+                      <TD>{formatDate(submission.submissionDate)}</TD>
+                      <TD>{submission.score}%</TD>
+                      <TD>{formatDate(submission.createdAt, "MMM d, yyyy h:mm a")}</TD>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+            <div className="flex items-center justify-between border-t border-slate-200 px-5 py-4">
+              <Button type="button" variant="outline" size="sm" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1}>
+                Previous
+              </Button>
+              <p className="text-sm text-slate-500">Page {page}</p>
+              <Button type="button" variant="outline" size="sm" onClick={() => setPage((current) => current + 1)} disabled={submissions.length < pageSize}>
+                Next
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Store Leaderboard</h2>
+            <div className="mt-4 space-y-3">
+              {analytics.leaderboard.map((entry, index) => (
+                <div key={`${entry.storeNumber}-${entry.name}-${index}`} className="flex items-center justify-between rounded-[20px] bg-slate-50 px-4 py-3">
+                  <div>
+                    <p className="font-medium text-slate-900">{entry.name}</p>
+                    <p className="text-sm text-slate-500">Store {entry.storeNumber}</p>
+                  </div>
+                  <p className="text-lg font-semibold text-amber-700">{entry.score}%</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
