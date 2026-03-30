@@ -148,13 +148,13 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
             <div className="mt-5 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full name</Label>
-                <Input id="name" {...form.register("name")} />
-                <p className="text-xs text-red-600">{form.formState.errors.name?.message}</p>
+                <Input id="name" {...form.register("name")} required/>
+                {/* <p className="text-xs text-red-600">{form.formState.errors.name?.message}</p> */}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="storeNumber">Store number</Label>
-                <Input id="storeNumber" {...form.register("storeNumber")} />
-                <p className="text-xs text-red-600">{form.formState.errors.storeNumber?.message}</p>
+                <Input id="storeNumber" {...form.register("storeNumber")} required/>
+                {/* <p className="text-xs text-red-600">{form.formState.errors.storeNumber?.message}</p> */}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="submissionDate">Date</Label>
@@ -195,7 +195,12 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
                 ) : null}
                 <Button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
+                    const isValid = await form.trigger();
+                    if (!isValid) {
+                      setError("Enter your details before starting the quiz.");
+                      return;
+                    }
                     if (!hasViewedContent) {
                       setError("Review the launch content before starting the quiz.");
                       return;
