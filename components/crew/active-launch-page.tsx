@@ -148,17 +148,17 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
             <div className="mt-5 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full name</Label>
-                <Input id="name" {...form.register("name")} required/>
-                {/* <p className="text-xs text-red-600">{form.formState.errors.name?.message}</p> */}
+                <Input id="name" {...form.register("name")} />
+                <p className="text-xs text-red-600">{form.formState.errors.name?.message}</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="storeNumber">Store number</Label>
-                <Input id="storeNumber" {...form.register("storeNumber")} required/>
-                {/* <p className="text-xs text-red-600">{form.formState.errors.storeNumber?.message}</p> */}
+                <Input id="storeNumber" {...form.register("storeNumber")} />
+                <p className="text-xs text-red-600">{form.formState.errors.storeNumber?.message}</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="submissionDate">Date</Label>
-                <Input id="submissionDate" type="date" {...form.register("submissionDate")} disabled/>
+                <Input id="submissionDate" type="date" {...form.register("submissionDate")} disabled />
                 <p className="text-xs text-red-600">{form.formState.errors.submissionDate?.message}</p>
               </div>
             </div>
@@ -205,6 +205,25 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
                       setError("Review the launch content before starting the quiz.");
                       return;
                     }
+
+                    const values = form.getValues();
+                    const query = new URLSearchParams({
+                      name: values.name.trim(),
+                      storeNumber: values.storeNumber.trim(),
+                    });
+                    const existingResponse = await fetch(`/api/public/submissions?${query.toString()}`);
+                    const existingData = await existingResponse.json();
+
+                    if (!existingResponse.ok) {
+                      setError(existingData.error ?? "Unable to verify existing submission.");
+                      return;
+                    }
+
+                    if (existingData.exists) {
+                      setError("A submission already exists for this name, store number. The quiz cannot be started again.");
+                      return;
+                    }
+
                     setError(null);
                     startQuiz();
                     setStage("quiz");

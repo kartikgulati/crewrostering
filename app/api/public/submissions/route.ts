@@ -3,8 +3,48 @@ import { NextResponse } from "next/server";
 
 import { gradeSubmission } from "@/lib/quiz";
 import { prisma } from "@/lib/prisma";
-import { submissionSchema } from "@/lib/validations";
+import { submissionLookupSchema, submissionSchema } from "@/lib/validations";
 import { startOfDayUtc } from "@/lib/utils";
+
+export async function GET(request: Request) {
+  if (!prisma) {
+    return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const parsed = submissionLookupSchema.safeParse({
+    name: searchParams.get("name"),
+    storeNumber: searchParams.get("storeNumber"),
+  });
+
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid lookup." }, { status: 400 });
+  }
+
+  const existingSubmission = await prisma.userSubmission.findUnique({
+    where: {
+      name_storeNumber: {
+        name: parsed.data.name.trim(),
+        storeNumber: parsed.data.storeNumber.trim(),
+      },
+    },
+    select: {
+      id: true,
+      score: true,
+      createdAt: true,
+    },
+  });
+
+  return NextResponse.json({
+    exists: Boolean(existingSubmission),
+    submission: existingSubmission
+      ? {
+          ...existingSubmission,
+          createdAt: existingSubmission.createdAt.toISOString(),
+        }
+      : null,
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +82,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(
-        { error: "A submission already exists for this crew member, store, and date." },
+        { error: "A submission already exists for this crew member and store number." },
         { status: 409 },
       );
     }

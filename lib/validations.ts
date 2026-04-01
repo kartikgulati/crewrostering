@@ -32,6 +32,11 @@ export const submissionSchema = z.object({
   durationSeconds: z.number().int().min(0).max(7200).optional(),
 });
 
+export const submissionLookupSchema = z.object({
+  name: z.string().min(2).max(120),
+  storeNumber: z.string().min(1).max(20),
+});
+
 export const submissionFiltersSchema = z.object({
   storeNumber: z.string().optional(),
   startDate: z.string().optional(),
