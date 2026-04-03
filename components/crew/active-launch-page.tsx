@@ -129,21 +129,15 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
         <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">{quiz.title}</h1>
         <p className="mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">{quiz.description}</p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-200">
-          <span className="inline-flex items-center gap-2">
-            <ShieldCheck className="size-4" />
-            No login required for crew
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <Clock3 className="size-4" />
-            Mobile-first completion flow
-          </span>
+          
+          
         </div>
       </div>
 
       {stage === "intro" && (
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <Card className="p-5">
-            <h2 className="text-lg font-semibold text-slate-900">Crew Check-In</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Enter Crew Details </h2>
             <p className="mt-2 text-sm text-slate-500">Enter your details, review the launch notes, then start the quiz.</p>
             <div className="mt-5 space-y-4">
               <div className="space-y-2">
