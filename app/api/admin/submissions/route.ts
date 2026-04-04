@@ -17,6 +17,7 @@ export async function GET(request: Request) {
 
   const where = {
     ...(parsed.data.storeNumber ? { storeNumber: parsed.data.storeNumber } : {}),
+    ...(parsed.data.quizId ? { quizId: parsed.data.quizId } : {}),
     ...(parsed.data.minScore !== undefined ? { score: { gte: parsed.data.minScore } } : {}),
     ...(parsed.data.startDate || parsed.data.endDate
       ? {
@@ -34,6 +35,13 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
       skip: (parsed.data.page - 1) * parsed.data.pageSize,
       take: parsed.data.pageSize,
+      include: {
+        quiz: {
+          select: {
+            title: true,
+          },
+        },
+      },
     }),
     prisma.userSubmission.count({ where }),
   ]);
@@ -41,6 +49,7 @@ export async function GET(request: Request) {
   return NextResponse.json({
     submissions: submissions.map((submission) => ({
       ...submission,
+      quizTitle: submission.quiz.title,
       submissionDate: submission.submissionDate.toISOString(),
       createdAt: submission.createdAt.toISOString(),
     })),

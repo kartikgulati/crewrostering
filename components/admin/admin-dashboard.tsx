@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, Download, LogOut, Trophy } from "lucide-react";
+import { BarChart3, Download, LogOut, Trash2, Trophy } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,8 @@ type SubmissionRow = {
   id: string;
   name: string;
   storeNumber: string;
+  quizId: string;
+  quizTitle: string;
   submissionDate: string;
   score: number;
   createdAt: string;
@@ -58,17 +60,31 @@ export function AdminDashboard({
   const [selectedQuiz, setSelectedQuiz] = useState<QuizRow | null>(initialQuizzes[0] ?? null);
   const [submissions, setSubmissions] = useState(initialSubmissions);
   const [analytics, setAnalytics] = useState(initialAnalytics);
-  const [filters, setFilters] = useState({ storeNumber: "", startDate: "", endDate: "", minScore: "" });
+  const [filters, setFilters] = useState({ storeNumber: "", quizId: "", startDate: "", endDate: "", minScore: "" });
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [exportError, setExportError] = useState<string | null>(null);
+  const [deletingSubmissionId, setDeletingSubmissionId] = useState<string | null>(null);
+
+  function buildSubmissionQuery(currentPage: number) {
+    const params = new URLSearchParams({
+      page: String(currentPage),
+      pageSize: String(pageSize),
+    });
+
+    if (filters.storeNumber) params.set("storeNumber", filters.storeNumber);
+    if (filters.quizId) params.set("quizId", filters.quizId);
+    if (filters.startDate) params.set("startDate", filters.startDate);
+    if (filters.endDate) params.set("endDate", filters.endDate);
+    if (filters.minScore) params.set("minScore", filters.minScore);
+
+    return params.toString();
+  }
 
   async function refresh() {
     const [quizResponse, submissionResponse, analyticsResponse] = await Promise.all([
       fetch("/api/admin/quizzes"),
-      fetch(
-        `/api/admin/submissions?storeNumber=${filters.storeNumber}&startDate=${filters.startDate}&endDate=${filters.endDate}&minScore=${filters.minScore || ""}&page=${page}&pageSize=${pageSize}`,
-      ),
+      fetch(`/api/admin/submissions?${buildSubmissionQuery(page)}`),
       fetch("/api/admin/analytics"),
     ]);
 
@@ -101,9 +117,7 @@ export function AdminDashboard({
 
   async function exportPdf() {
     setExportError(null);
-    const response = await fetch(
-      `/api/admin/submissions/export?storeNumber=${filters.storeNumber}&startDate=${filters.startDate}&endDate=${filters.endDate}&minScore=${filters.minScore || ""}`,
-    );
+    const response = await fetch(`/api/admin/submissions/export?${buildSubmissionQuery(page)}`);
     if (!response.ok) {
       const message = await response.text();
       setExportError(message || "Unable to export PDF.");
@@ -125,13 +139,26 @@ export function AdminDashboard({
     URL.revokeObjectURL(url);
   }
 
+  async function deleteSubmission(id: string) {
+    setDeletingSubmissionId(id);
+
+    const response = await fetch(`/api/admin/submissions/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      setDeletingSubmissionId(null);
+      return;
+    }
+
+    await refresh();
+    setDeletingSubmissionId(null);
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <div className="rounded-[32px] bg-[linear-gradient(135deg,_#1e293b,_#0f172a)] p-6 text-white">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <Badge className="bg-white/15 text-white">Admin Panel</Badge>
-            <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
               Create launch modules, keep exactly one quiz active, review completion rates, and export store-level reports.
             </p>
@@ -232,6 +259,18 @@ export function AdminDashboard({
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Input placeholder="Store number" value={filters.storeNumber} onChange={(event) => setFilters((current) => ({ ...current, storeNumber: event.target.value }))} />
+              <select
+                value={filters.quizId}
+                onChange={(event) => setFilters((current) => ({ ...current, quizId: event.target.value }))}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+              >
+                <option value="">All quizzes</option>
+                {quizzes.map((quiz) => (
+                  <option key={quiz.id} value={quiz.id}>
+                    {quiz.title}
+                  </option>
+                ))}
+              </select>
               <Input type="number" placeholder="Minimum score" value={filters.minScore} onChange={(event) => setFilters((current) => ({ ...current, minScore: event.target.value }))} />
               <Input type="date" value={filters.startDate} onChange={(event) => setFilters((current) => ({ ...current, startDate: event.target.value }))} />
               <Input type="date" value={filters.endDate} onChange={(event) => setFilters((current) => ({ ...current, endDate: event.target.value }))} />
@@ -260,9 +299,11 @@ export function AdminDashboard({
                   <tr>
                     <TH>Name</TH>
                     <TH>Store</TH>
+                    <TH>Quiz</TH>
                     <TH>Date</TH>
                     <TH>Score</TH>
                     <TH>Completed</TH>
+                    <TH>Actions</TH>
                   </tr>
                 </thead>
                 <tbody>
@@ -270,9 +311,22 @@ export function AdminDashboard({
                     <tr key={submission.id} className="border-t border-slate-100">
                       <TD>{submission.name}</TD>
                       <TD>{submission.storeNumber}</TD>
+                      <TD>{submission.quizTitle}</TD>
                       <TD>{formatDate(submission.submissionDate)}</TD>
                       <TD>{submission.score}%</TD>
                       <TD>{formatDate(submission.createdAt, "MMM d, yyyy h:mm a")}</TD>
+                      <TD>
+                        <Button
+                          className="bg-amber-500"
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteSubmission(submission.id)}
+                          disabled={deletingSubmissionId === submission.id}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </TD>
                     </tr>
                   ))}
                 </tbody>

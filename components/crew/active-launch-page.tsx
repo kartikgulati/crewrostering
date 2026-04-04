@@ -126,7 +126,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6">
       <div className="rounded-[32px] bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.25),_transparent_32%),linear-gradient(135deg,_#0f172a,_#1e293b)] p-6 text-white shadow-xl">
         <Badge className="bg-white/15 text-white">Active Launch</Badge>
-        <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">{quiz.title}</h1>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{quiz.title}</h1>
         <p className="mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">{quiz.description}</p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-200">
           
@@ -173,7 +173,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
               }}
             >
               <article
-                className="prose prose-slate max-w-none prose-headings:font-serif prose-img:rounded-2xl"
+                className="prose prose-slate max-w-none prose-img:rounded-2xl"
                 dangerouslySetInnerHTML={{ __html: renderRichContent(quiz.content) }}
               />
             </div>

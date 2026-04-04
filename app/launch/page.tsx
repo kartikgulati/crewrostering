@@ -9,7 +9,7 @@ export default async function LaunchPage() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
         <div className="rounded-[32px] border border-amber-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="font-serif text-3xl font-semibold text-slate-900">Database Setup Required</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">Database Setup Required</h1>
           <p className="mt-3 text-sm text-slate-500">
             Set <code>DATABASE_URL</code> in your environment, then run <code>npm run db:push</code> and <code>npm run seed</code>.
           </p>
@@ -24,7 +24,7 @@ export default async function LaunchPage() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="font-serif text-3xl font-semibold text-slate-900">No Active Launch Module</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">No Active Launch Module</h1>
           <p className="mt-3 text-sm text-slate-500">An administrator needs to publish a launch before crew can complete verification.</p>
         </div>
       </div>

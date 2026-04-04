@@ -39,13 +39,10 @@ export const submissionLookupSchema = z.object({
 
 export const submissionFiltersSchema = z.object({
   storeNumber: z.string().optional(),
+  quizId: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   minScore: z.coerce.number().int().min(0).max(100).optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(10),
-});
-
-export const quizSuggestionSchema = z.object({
-  content: z.string().min(50),
 });

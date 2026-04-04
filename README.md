@@ -23,7 +23,6 @@ Production-oriented Next.js application for managing restaurant product launch t
 - Duplicate submission prevention by `name + store number + date`
 - Secure admin panel for launch creation, activation, analytics, filtering, and exports
 - Leaderboard and store-level completion stats
-- Optional AI-assisted quiz suggestions derived from content
 
 ## Setup
 
@@ -96,7 +95,7 @@ node -e "require('bcryptjs').hash(process.argv[1],10).then(console.log)" "YourSt
 
 - `app/launch`: public crew experience
 - `app/admin`: secure admin interface
-- `app/api`: auth, quiz, submission, analytics, export, upload, and AI suggestion routes
+- `app/api`: auth, quiz, submission, analytics, export, and upload routes
 - `components`: UI, crew flow, admin dashboard, editor
 - `lib`: auth, Prisma, grading, PDF, content rendering, validation
 - `prisma`: schema and seed data
@@ -113,4 +112,3 @@ node -e "require('bcryptjs').hash(process.argv[1],10).then(console.log)" "YourSt
 
 - A running PostgreSQL instance is required before the app can render data-backed pages
 - Cloudinary is optional but recommended for non-technical managers who need direct image uploads
-- The AI suggestion endpoint is deterministic placeholder logic; swap it for a real LLM call if you want model-backed authoring assistance

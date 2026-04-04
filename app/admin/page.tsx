@@ -11,7 +11,7 @@ export default async function AdminPage() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
         <div className="rounded-[32px] border border-amber-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="font-serif text-3xl font-semibold text-slate-900">Database Setup Required</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">Database Setup Required</h1>
           <p className="mt-3 text-sm text-slate-500">
             Configure <code>DATABASE_URL</code> before using the admin panel, then run <code>npm run db:push</code> and <code>npm run seed</code>.
           </p>
@@ -28,6 +28,13 @@ export default async function AdminPage() {
     prisma.userSubmission.findMany({
       take: 10,
       orderBy: { createdAt: "desc" },
+      include: {
+        quiz: {
+          select: {
+            title: true,
+          },
+        },
+      },
     }),
     prisma.userSubmission.groupBy({
       by: ["storeNumber"],
@@ -58,6 +65,7 @@ export default async function AdminPage() {
       }))}
       initialSubmissions={submissions.map((submission) => ({
         ...submission,
+        quizTitle: submission.quiz.title,
         submissionDate: submission.submissionDate.toISOString(),
         createdAt: submission.createdAt.toISOString(),
       }))}

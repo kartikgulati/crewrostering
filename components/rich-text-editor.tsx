@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -8,7 +9,6 @@ import { ImagePlus, List, ListOrdered, Pilcrow, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 type Props = {
   value: Record<string, unknown> | null;
@@ -34,6 +34,17 @@ export function RichTextEditor({ value, onChange }: Props) {
       onChange(instance.getJSON());
     },
   });
+
+  useEffect(() => {
+    if (!editor || !value) {
+      return;
+    }
+
+    const currentValue = editor.getJSON();
+    if (JSON.stringify(currentValue) !== JSON.stringify(value)) {
+      editor.commands.setContent(value, { emitUpdate: false });
+    }
+  }, [editor, value]);
 
   return (
     <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white">

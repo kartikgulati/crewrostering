@@ -17,6 +17,7 @@ export async function GET(request: Request) {
 
   const where = {
     ...(parsed.data.storeNumber ? { storeNumber: parsed.data.storeNumber } : {}),
+    ...(parsed.data.quizId ? { quizId: parsed.data.quizId } : {}),
     ...(parsed.data.minScore !== undefined ? { score: { gte: parsed.data.minScore } } : {}),
     ...(parsed.data.startDate || parsed.data.endDate
       ? {

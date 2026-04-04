@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2, WandSparkles } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -54,6 +54,39 @@ export function QuizBuilder({
     resolver: zodResolver(quizSchema.pick({ title: true, description: true })),
   });
 
+  function addOption(questionIndex: number) {
+    setQuestions((current) =>
+      current.map((item, itemIndex) =>
+        itemIndex === questionIndex && item.options.length < 4 ? { ...item, options: [...item.options, ""] } : item,
+      ),
+    );
+  }
+
+  function removeOption(questionIndex: number, optionIndex: number) {
+    setQuestions((current) =>
+      current.map((item, itemIndex) => {
+        if (itemIndex !== questionIndex || item.options.length <= 2) {
+          return item;
+        }
+
+        const nextOptions = item.options.filter((_, currentOptionIndex) => currentOptionIndex !== optionIndex);
+        let nextCorrectAnswer = item.correctAnswer;
+
+        if (item.correctAnswer === optionIndex) {
+          nextCorrectAnswer = 0;
+        } else if (item.correctAnswer > optionIndex) {
+          nextCorrectAnswer = item.correctAnswer - 1;
+        }
+
+        return {
+          ...item,
+          options: nextOptions,
+          correctAnswer: nextCorrectAnswer,
+        };
+      }),
+    );
+  }
+
   async function saveQuiz() {
     const valid = await form.trigger();
     const payload = {
@@ -85,31 +118,6 @@ export function QuizBuilder({
     }
 
     onSaved();
-    setLoading(false);
-  }
-
-  async function suggestQuestions() {
-    setLoading(true);
-    setError(null);
-    const response = await fetch("/api/admin/ai/suggest-questions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: JSON.stringify(content) }),
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      setError(data.error ?? "Unable to generate suggestions.");
-      setLoading(false);
-      return;
-    }
-
-    setQuestions(
-      data.questions.map((question: QuestionInput, index: number) => ({
-        ...question,
-        order: index + 1,
-      })),
-    );
     setLoading(false);
   }
 
@@ -147,9 +155,6 @@ export function QuizBuilder({
             <p className="text-sm text-slate-500">Questions should be directly answerable from the launch content.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="secondary" onClick={suggestQuestions} disabled={loading}>
-              <WandSparkles className="mr-2 size-4" /> AI Suggest
-            </Button>
             <Button
               type="button"
               variant="outline"
@@ -192,7 +197,14 @@ export function QuizBuilder({
               <div className="grid gap-3 lg:grid-cols-2">
                 {question.options.map((option, optionIndex) => (
                   <div key={`option-${index}-${optionIndex}`} className="space-y-2">
-                    <Label>Option {optionIndex + 1}</Label>
+                    <div className="flex items-center justify-between gap-3">
+                      <Label>Option {optionIndex + 1}</Label>
+                      {question.options.length > 2 ? (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removeOption(index, optionIndex)}>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      ) : null}
+                    </div>
                     <Input
                       value={option}
                       onChange={(event) =>
@@ -210,6 +222,11 @@ export function QuizBuilder({
                     />
                   </div>
                 ))}
+              </div>
+              <div>
+                <Button type="button" variant="outline" size="sm" onClick={() => addOption(index)} disabled={question.options.length >= 4}>
+                  <Plus className="mr-2 size-4" /> Add Option
+                </Button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {question.options.map((_, optionIndex) => (
