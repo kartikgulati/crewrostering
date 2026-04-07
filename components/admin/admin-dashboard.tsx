@@ -56,6 +56,7 @@ export function AdminDashboard({
   initialSubmissions: SubmissionRow[];
   initialAnalytics: Analytics;
 }) {
+  const [activeTab, setActiveTab] = useState<"dashboard" | "create" | "submissions">("dashboard");
   const [quizzes, setQuizzes] = useState(initialQuizzes);
   const [selectedQuiz, setSelectedQuiz] = useState<QuizRow | null>(initialQuizzes[0] ?? null);
   const [submissions, setSubmissions] = useState(initialSubmissions);
@@ -152,6 +153,12 @@ export function AdminDashboard({
     setDeletingSubmissionId(null);
   }
 
+  const tabs = [
+    { id: "dashboard", label: "Dashboard" },
+    { id: "create", label: "Create Quiz" },
+    { id: "submissions", label: "Submissions" },
+  ] as const;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <div className="rounded-[32px] bg-[linear-gradient(135deg,_#1e293b,_#0f172a)] p-6 text-white">
@@ -167,12 +174,35 @@ export function AdminDashboard({
             <LogOut className="mr-2 size-4" /> Sign out
           </Button>
         </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  isActive ? "bg-white text-slate-950" : "bg-white/10 text-white hover:bg-white/15"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
+      {activeTab === "dashboard" ? (
+        <div className="mt-6 space-y-6">
           <Card className="p-5">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-[24px] bg-slate-50 p-4">
+                <p className="text-sm text-slate-500">Total quizzes</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-950">{quizzes.length}</p>
+              </div>
               <div className="rounded-[24px] bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Total submissions</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.totalSubmissions}</p>
@@ -187,22 +217,104 @@ export function AdminDashboard({
                 </p>
                 <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.completionByStore.length}</p>
               </div>
-              <div className="rounded-[24px] bg-slate-50 p-4">
-                <p className="flex items-center gap-2 text-sm text-slate-500">
-                  <Trophy className="size-4" /> Top store
-                </p>
-                <p className="mt-2 text-lg font-semibold text-slate-950">{analytics.leaderboard[0]?.storeNumber ?? "No data"}</p>
-              </div>
             </div>
           </Card>
 
-          <QuizBuilder key={selectedQuiz?.id || "new-module"} initialValue={selectedQuiz} onSaved={refresh} />
-        </div>
+          <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+            <Card className="p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">All Quizzes</h2>
+                  <p className="text-sm text-slate-500">Overview of every listed quiz and its current status.</p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setSelectedQuiz({
+                      id: "",
+                      title: "",
+                      description: "",
+                      isActive: false,
+                      createdAt: new Date().toISOString(),
+                      content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "New launch content" }] }] },
+                      questions: [{ id: "", questionText: "", options: ["", ""], correctAnswer: 0, explanation: "", order: 1 }],
+                    });
+                    setActiveTab("create");
+                  }}
+                >
+                  Create Quiz
+                </Button>
+              </div>
+              <div className="mt-4 space-y-3">
+                {quizzes.map((quiz) => (
+                  <div key={quiz.id} className="rounded-[24px] border border-slate-200 p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-slate-900">{quiz.title}</h3>
+                          {quiz.isActive ? <Badge>Active</Badge> : null}
+                        </div>
+                        <p className="mt-1 text-sm text-slate-500">{quiz.description}</p>
+                        <p className="mt-2 text-xs uppercase tracking-[0.16em] text-slate-400">Created {formatDate(quiz.createdAt)}</p>
+                      </div>
+                      <p className="text-sm text-slate-500">{quiz.questions.length} questions</p>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedQuiz(quiz);
+                          setActiveTab("create");
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => activateQuiz(quiz.id)}>
+                        Set active
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => deleteQuiz(quiz.id)}>
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
 
-        <div className="space-y-6">
+            <Card className="p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Top Store Performance</h2>
+              <div className="mt-4 space-y-3">
+                <div className="rounded-[24px] bg-slate-50 p-4">
+                  <p className="flex items-center gap-2 text-sm text-slate-500">
+                    <Trophy className="size-4" /> Leading store
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-950">{analytics.leaderboard[0]?.storeNumber ?? "No data"}</p>
+                </div>
+                {analytics.leaderboard.map((entry, index) => (
+                  <div key={`${entry.storeNumber}-${entry.name}-${index}`} className="flex items-center justify-between rounded-[20px] bg-slate-50 px-4 py-3">
+                    <div>
+                      <p className="font-medium text-slate-900">{entry.name}</p>
+                      <p className="text-sm text-slate-500">Store {entry.storeNumber}</p>
+                    </div>
+                    <p className="text-lg font-semibold text-amber-700">{entry.score}%</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      ) : null}
+
+      {activeTab === "create" ? (
+        <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
           <Card className="p-5">
-            <h2 className="text-lg font-semibold text-slate-900">Launch Modules</h2>
-            <div className="mt-4 space-y-3">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Quiz Menu</h2>
+                <p className="text-sm text-slate-500">Create a new quiz or choose an existing one to edit.</p>
+              </div>
               <Button
                 type="button"
                 onClick={() =>
@@ -217,8 +329,10 @@ export function AdminDashboard({
                   })
                 }
               >
-                Create New Module
+                New Quiz
               </Button>
+            </div>
+            <div className="mt-4 space-y-3">
               {quizzes.map((quiz) => (
                 <div key={quiz.id} className="rounded-[24px] border border-slate-200 p-4">
                   <div className="flex items-start justify-between gap-4">
@@ -228,18 +342,9 @@ export function AdminDashboard({
                         {quiz.isActive ? <Badge>Active</Badge> : null}
                       </div>
                       <p className="mt-1 text-sm text-slate-500">{quiz.description}</p>
-                      <p className="mt-2 text-xs uppercase tracking-[0.16em] text-slate-400">Created {formatDate(quiz.createdAt)}</p>
                     </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
                     <Button type="button" variant="secondary" size="sm" onClick={() => setSelectedQuiz(quiz)}>
                       Edit
-                    </Button>
-                    <Button type="button" variant="outline" size="sm" onClick={() => activateQuiz(quiz.id)}>
-                      Set active
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => deleteQuiz(quiz.id)}>
-                      Delete
                     </Button>
                   </div>
                 </div>
@@ -247,11 +352,17 @@ export function AdminDashboard({
             </div>
           </Card>
 
+          <QuizBuilder key={selectedQuiz?.id || "new-module"} initialValue={selectedQuiz} onSaved={refresh} />
+        </div>
+      ) : null}
+
+      {activeTab === "submissions" ? (
+        <div className="mt-6 space-y-6">
           <Card className="p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">Submission Filters</h2>
-                <p className="text-sm text-slate-500">Filter and export completion reports.</p>
+                <p className="text-sm text-slate-500">View all submission data, filter records, and export reports.</p>
               </div>
               <Button type="button" variant="outline" onClick={exportPdf}>
                 <Download className="mr-2 size-4" /> Export PDF
@@ -291,7 +402,7 @@ export function AdminDashboard({
 
           <Card className="overflow-hidden">
             <div className="border-b border-slate-200 px-5 py-4">
-              <h2 className="text-lg font-semibold text-slate-900">Recent Submissions</h2>
+              <h2 className="text-lg font-semibold text-slate-900">All Submission Data</h2>
             </div>
             <div className="overflow-x-auto">
               <Table>
@@ -342,23 +453,8 @@ export function AdminDashboard({
               </Button>
             </div>
           </Card>
-
-          <Card className="p-5">
-            <h2 className="text-lg font-semibold text-slate-900">Store Leaderboard</h2>
-            <div className="mt-4 space-y-3">
-              {analytics.leaderboard.map((entry, index) => (
-                <div key={`${entry.storeNumber}-${entry.name}-${index}`} className="flex items-center justify-between rounded-[20px] bg-slate-50 px-4 py-3">
-                  <div>
-                    <p className="font-medium text-slate-900">{entry.name}</p>
-                    <p className="text-sm text-slate-500">Store {entry.storeNumber}</p>
-                  </div>
-                  <p className="text-lg font-semibold text-amber-700">{entry.score}%</p>
-                </div>
-              ))}
-            </div>
-          </Card>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
