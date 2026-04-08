@@ -167,7 +167,7 @@ export function AdminDashboard({
             <Badge className="bg-white/15 text-white">Admin Panel</Badge>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
-              Create launch modules, keep exactly one quiz active, review completion rates, and export store-level reports.
+              Create launch quizes, keep exactly one quiz active, review completion rates, and export store-level reports.
             </p>
           </div>
           <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10" onClick={() => signOut({ callbackUrl: "/admin/login" })}>
