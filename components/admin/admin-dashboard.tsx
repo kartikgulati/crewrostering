@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, Download, LogOut, Trash2, Trophy } from "lucide-react";
+import { BarChart3, Download, ExternalLink, LogOut, Trash2, Trophy } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
@@ -153,6 +153,10 @@ export function AdminDashboard({
     setDeletingSubmissionId(null);
   }
 
+  function openQuizInNewTab(id: string) {
+    window.open(`/launch?quizId=${encodeURIComponent(id)}`, "_blank", "noopener,noreferrer");
+  }
+
   const tabs = [
     { id: "dashboard", label: "Dashboard" },
     { id: "create", label: "Create Quiz" },
@@ -260,6 +264,9 @@ export function AdminDashboard({
                       <p className="text-sm text-slate-500">{quiz.questions.length} questions</p>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={() => openQuizInNewTab(quiz.id)}>
+                        <ExternalLink className="mr-2 size-4" /> Open Quiz
+                      </Button>
                       <Button
                         type="button"
                         variant="secondary"
@@ -343,9 +350,14 @@ export function AdminDashboard({
                       </div>
                       <p className="mt-1 text-sm text-slate-500">{quiz.description}</p>
                     </div>
-                    <Button type="button" variant="secondary" size="sm" onClick={() => setSelectedQuiz(quiz)}>
-                      Edit
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={() => openQuizInNewTab(quiz.id)}>
+                        <ExternalLink className="mr-2 size-4" /> Open Quiz
+                      </Button>
+                      <Button type="button" variant="secondary" size="sm" onClick={() => setSelectedQuiz(quiz)}>
+                        Edit
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}

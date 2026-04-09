@@ -14,6 +14,19 @@ export async function getActiveQuiz() {
   });
 }
 
+export async function getQuizById(id: string) {
+  if (!prisma) return null;
+
+  return prisma.quiz.findUnique({
+    where: { id },
+    include: {
+      questions: {
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+}
+
 export async function gradeSubmission(quizId: string, answers: { questionId: string; selectedAnswer: number }[]) {
   if (!prisma) {
     throw new Error("Database is not configured");

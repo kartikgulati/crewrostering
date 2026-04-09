@@ -1,10 +1,14 @@
 import { ActiveLaunchPage } from "@/components/crew/active-launch-page";
 import { hasDatabaseUrl } from "@/lib/prisma";
-import { getActiveQuiz } from "@/lib/quiz";
+import { getActiveQuiz, getQuizById } from "@/lib/quiz";
 
 export const dynamic = "force-dynamic";
 
-export default async function LaunchPage() {
+export default async function LaunchPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ quizId?: string }>;
+}) {
   if (!hasDatabaseUrl) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
@@ -18,14 +22,20 @@ export default async function LaunchPage() {
     );
   }
 
-  const quiz = await getActiveQuiz();
+  const params = await searchParams;
+  const quizId = params?.quizId?.trim();
+  const quiz = quizId ? await getQuizById(quizId) : await getActiveQuiz();
 
   if (!quiz) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-3xl font-semibold text-slate-900">No Active Launch Module</h1>
-          <p className="mt-3 text-sm text-slate-500">An administrator needs to publish a launch before crew can complete verification.</p>
+          <h1 className="text-3xl font-semibold text-slate-900">{quizId ? "Quiz Not Found" : "No Active Launch Module"}</h1>
+          <p className="mt-3 text-sm text-slate-500">
+            {quizId
+              ? "The requested quiz could not be found."
+              : "An administrator needs to publish a launch before crew can complete verification."}
+          </p>
         </div>
       </div>
     );
