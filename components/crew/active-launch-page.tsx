@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { renderRichContent } from "@/lib/content";
+import { renderRichContent, richContentClassName } from "@/lib/content";
 import { submissionSchema } from "@/lib/validations";
 import { useQuizSessionStore } from "@/store/quiz-session";
 
@@ -135,7 +135,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
       </div>
 
       {stage === "intro" && (
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid gap-6 lg:grid-cols-[0.7fr_1.5fr]">
           <Card className="p-5">
             <h2 className="text-lg font-semibold text-slate-900">Enter Crew Details </h2>
             <p className="mt-2 text-sm text-slate-500">Enter your details, review the launch notes, then start the quiz.</p>
@@ -173,12 +173,12 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
               }}
             >
               <article
-                className="prose prose-slate max-w-none prose-img:rounded-2xl"
+                className={richContentClassName}
                 dangerouslySetInnerHTML={{ __html: renderRichContent(quiz.content) }}
               />
             </div>
             <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-green-500">
                 {hasViewedContent ? "Content fully viewed" : "Scroll to the bottom to unlock the quiz"}
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">

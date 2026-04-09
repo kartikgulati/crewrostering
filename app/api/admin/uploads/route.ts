@@ -16,9 +16,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file uploaded." }, { status: 400 });
     }
 
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json({ error: "Only image files are supported." }, { status: 400 });
+    }
+
     const uploaded = await uploadImage(file);
     return NextResponse.json({ url: uploaded.secure_url });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Upload failed." }, { status: 400 });
+    const message = error instanceof Error ? error.message : "Upload failed.";
+    const status = message === "Cloudinary is not configured." ? 503 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
 }
