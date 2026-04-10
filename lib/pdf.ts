@@ -1,25 +1,41 @@
 import PDFDocument from "pdfkit";
 import { format } from "date-fns";
+import path from "node:path";
 
 type SubmissionRow = {
   name: string;
+  quizTitle: string;
   storeNumber: string;
   submissionDate: Date;
   score: number;
   createdAt: Date;
 };
 
+const PDF_FONT_PATH = path.join(process.cwd(), "node_modules/next/dist/compiled/@vercel/og/noto-sans-v27-latin-regular.ttf");
+
 export async function buildSubmissionPdf(rows: SubmissionRow[]) {
-  const doc = new PDFDocument({ margin: 40, size: "A4" });
+  const doc = new PDFDocument({ margin: 40, size: "A4", font: PDF_FONT_PATH });
   const chunks: Buffer[] = [];
   const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-  const columns = {
-    name: doc.page.margins.left,
-    store: doc.page.margins.left + pageWidth * 0.33,
-    date: doc.page.margins.left + pageWidth * 0.5,
-    score: doc.page.margins.left + pageWidth * 0.72,
-    completed: doc.page.margins.left + pageWidth * 0.82,
-  };
+  const columnLayout = [
+    { key: "name", label: "Name", width: 0.2 },
+    { key: "quizTitle", label: "Quiz", width: 0.28 },
+    { key: "storeNumber", label: "Store", width: 0.1 },
+    { key: "submissionDate", label: "Date", width: 0.14 },
+    { key: "score", label: "Score", width: 0.1 },
+    { key: "createdAt", label: "Completed", width: 0.18 },
+  ] as const;
+  const columns = columnLayout.reduce<Record<(typeof columnLayout)[number]["key"], { x: number; width: number }>>(
+    (accumulator, column, index) => {
+      const previous = index === 0 ? doc.page.margins.left : accumulator[columnLayout[index - 1].key].x + accumulator[columnLayout[index - 1].key].width;
+      accumulator[column.key] = {
+        x: previous,
+        width: pageWidth * column.width,
+      };
+      return accumulator;
+    },
+    {} as Record<(typeof columnLayout)[number]["key"], { x: number; width: number }>,
+  );
 
   doc.on("data", (chunk) => chunks.push(chunk));
   const completed = new Promise<Buffer>((resolve) => {
@@ -58,11 +74,9 @@ export async function buildSubmissionPdf(rows: SubmissionRow[]) {
       .roundedRect(doc.page.margins.left, top, pageWidth, 28, 8)
       .fill("#111827");
     doc.fillColor("#ffffff").fontSize(9);
-    doc.text("Name", columns.name + 10, top + 9, { width: pageWidth * 0.28 });
-    doc.text("Store", columns.store + 10, top + 9, { width: pageWidth * 0.12 });
-    doc.text("Date", columns.date + 10, top + 9, { width: pageWidth * 0.18 });
-    doc.text("Score", columns.score + 10, top + 9, { width: pageWidth * 0.08 });
-    doc.text("Completed", columns.completed + 10, top + 9, { width: pageWidth * 0.16 });
+    columnLayout.forEach((column) => {
+      doc.text(column.label, columns[column.key].x + 10, top + 9, { width: columns[column.key].width - 12 });
+    });
     doc.moveDown(1.8);
   };
 
@@ -80,11 +94,18 @@ export async function buildSubmissionPdf(rows: SubmissionRow[]) {
       .fill(index % 2 === 0 ? "#f8fafc" : "#ffffff");
 
     doc.fillColor("#111827").fontSize(10);
-    doc.text(row.name, columns.name + 10, top + 11, { width: pageWidth * 0.28, ellipsis: true });
-    doc.text(row.storeNumber, columns.store + 10, top + 11, { width: pageWidth * 0.12, ellipsis: true });
-    doc.text(format(row.submissionDate, "MMM d, yyyy"), columns.date + 10, top + 11, { width: pageWidth * 0.18, ellipsis: true });
-    doc.text(`${row.score}%`, columns.score + 10, top + 11, { width: pageWidth * 0.08, ellipsis: true });
-    doc.text(format(row.createdAt, "MMM d, yyyy h:mm a"), columns.completed + 10, top + 11, { width: pageWidth * 0.16, ellipsis: true });
+    doc.text(row.name, columns.name.x + 10, top + 11, { width: columns.name.width - 12, ellipsis: true });
+    doc.text(row.quizTitle, columns.quizTitle.x + 10, top + 11, { width: columns.quizTitle.width - 12, ellipsis: true });
+    doc.text(row.storeNumber, columns.storeNumber.x + 10, top + 11, { width: columns.storeNumber.width - 12, ellipsis: true });
+    doc.text(format(row.submissionDate, "MMM d, yyyy"), columns.submissionDate.x + 10, top + 11, {
+      width: columns.submissionDate.width - 12,
+      ellipsis: true,
+    });
+    doc.text(`${row.score}%`, columns.score.x + 10, top + 11, { width: columns.score.width - 12, ellipsis: true });
+    doc.text(format(row.createdAt, "MMM d, yyyy h:mm a"), columns.createdAt.x + 10, top + 11, {
+      width: columns.createdAt.width - 12,
+      ellipsis: true,
+    });
     doc.moveDown(1.8);
   });
 

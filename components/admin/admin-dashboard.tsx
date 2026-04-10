@@ -120,7 +120,7 @@ export function AdminDashboard({
     setExportError(null);
     const response = await fetch(`/api/admin/submissions/export?${buildSubmissionQuery(page)}`);
     if (!response.ok) {
-      const message = await response.text();
+      const message = (await response.text()).trim();
       setExportError(message || "Unable to export PDF.");
       return;
     }
