@@ -1,8 +1,23 @@
 import { ActiveLaunchPage } from "@/components/crew/active-launch-page";
-import { hasDatabaseUrl } from "@/lib/prisma";
+import { hasDatabaseUrl, isPrismaConnectionError } from "@/lib/prisma";
 import { getActiveQuiz, getQuizById } from "@/lib/quiz";
 
 export const dynamic = "force-dynamic";
+
+function DatabaseUnavailableState() {
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-20">
+      <div className="rounded-[32px] border border-amber-200 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-3xl font-semibold text-slate-900">Database Unavailable</h1>
+        <p className="mt-3 text-sm text-slate-500">
+          The application cannot reach the database right now. Verify the Supabase database is online and that
+          <code> DATABASE_URL </code>
+          is correct for this environment.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default async function LaunchPage({
   searchParams,
@@ -24,7 +39,22 @@ export default async function LaunchPage({
 
   const params = await searchParams;
   const quizId = params?.quizId?.trim();
-  const quiz = quizId ? await getQuizById(quizId) : await getActiveQuiz();
+  let quiz = null;
+  let databaseUnavailable = false;
+
+  try {
+    quiz = quizId ? await getQuizById(quizId) : await getActiveQuiz();
+  } catch (error) {
+    if (isPrismaConnectionError(error)) {
+      databaseUnavailable = true;
+    } else {
+      throw error;
+    }
+  }
+
+  if (databaseUnavailable) {
+    return <DatabaseUnavailableState />;
+  }
 
   if (!quiz) {
     return (

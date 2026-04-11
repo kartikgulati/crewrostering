@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { gradeSubmission } from "@/lib/quiz";
-import { prisma } from "@/lib/prisma";
+import { isPrismaConnectionError, prisma } from "@/lib/prisma";
 import { submissionLookupSchema, submissionSchema } from "@/lib/validations";
 import { startOfDayUtc } from "@/lib/utils";
 
@@ -21,29 +21,37 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid lookup." }, { status: 400 });
   }
 
-  const existingSubmission = await prisma.userSubmission.findUnique({
-    where: {
-      name_storeNumber: {
-        name: parsed.data.name.trim(),
-        storeNumber: parsed.data.storeNumber.trim(),
+  try {
+    const existingSubmission = await prisma.userSubmission.findUnique({
+      where: {
+        name_storeNumber: {
+          name: parsed.data.name.trim(),
+          storeNumber: parsed.data.storeNumber.trim(),
+        },
       },
-    },
-    select: {
-      id: true,
-      score: true,
-      createdAt: true,
-    },
-  });
+      select: {
+        id: true,
+        score: true,
+        createdAt: true,
+      },
+    });
 
-  return NextResponse.json({
-    exists: Boolean(existingSubmission),
-    submission: existingSubmission
-      ? {
-          ...existingSubmission,
-          createdAt: existingSubmission.createdAt.toISOString(),
-        }
-      : null,
-  });
+    return NextResponse.json({
+      exists: Boolean(existingSubmission),
+      submission: existingSubmission
+        ? {
+            ...existingSubmission,
+            createdAt: existingSubmission.createdAt.toISOString(),
+          }
+        : null,
+    });
+  } catch (error) {
+    if (isPrismaConnectionError(error)) {
+      return NextResponse.json({ error: "Database is temporarily unavailable." }, { status: 503 });
+    }
+
+    throw error;
+  }
 }
 
 export async function POST(request: Request) {
@@ -80,6 +88,10 @@ export async function POST(request: Request) {
       evaluated: graded.evaluated,
     });
   } catch (error) {
+    if (isPrismaConnectionError(error)) {
+      return NextResponse.json({ error: "Database is temporarily unavailable." }, { status: 503 });
+    }
+
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(
         { error: "A submission already exists for this crew member and store number." },

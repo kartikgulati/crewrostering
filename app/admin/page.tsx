@@ -1,8 +1,23 @@
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
-import { hasDatabaseUrl, prisma } from "@/lib/prisma";
+import { hasDatabaseUrl, isPrismaConnectionError, prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
+
+function DatabaseUnavailableState() {
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-20">
+      <div className="rounded-[32px] border border-amber-200 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-3xl font-semibold text-slate-900">Database Unavailable</h1>
+        <p className="mt-3 text-sm text-slate-500">
+          The application cannot reach the database right now. Verify the Supabase instance is online and that
+          <code> DATABASE_URL </code>
+          is correct for this environment.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default async function AdminPage() {
   await requireAdminSession();
@@ -20,36 +35,60 @@ export default async function AdminPage() {
     );
   }
 
-  const [quizzes, submissions, storeStats, leaderboardRaw] = await Promise.all([
-    prisma.quiz.findMany({
-      include: { questions: { orderBy: { order: "asc" } } },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.userSubmission.findMany({
-      take: 10,
-      orderBy: { createdAt: "desc" },
-      include: {
-        quiz: {
-          select: {
-            title: true,
+  let quizzes;
+  let submissions;
+  let storeStats;
+  let leaderboardRaw;
+  let totalSubmissions;
+  let averageAggregate;
+  let databaseUnavailable = false;
+
+  try {
+    [quizzes, submissions, storeStats, leaderboardRaw] = await Promise.all([
+      prisma.quiz.findMany({
+        include: { questions: { orderBy: { order: "asc" } } },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.userSubmission.findMany({
+        take: 10,
+        orderBy: { createdAt: "desc" },
+        include: {
+          quiz: {
+            select: {
+              title: true,
+            },
           },
         },
-      },
-    }),
-    prisma.userSubmission.groupBy({
-      by: ["storeNumber"],
-      _count: { _all: true },
-      _avg: { score: true },
-    }),
-    prisma.userSubmission.findMany({
-      orderBy: [{ score: "desc" }, { createdAt: "asc" }],
-      take: 5,
-      select: { storeNumber: true, score: true, name: true },
-    }),
-  ]);
+      }),
+      prisma.userSubmission.groupBy({
+        by: ["storeNumber"],
+        _count: { _all: true },
+        _avg: { score: true },
+      }),
+      prisma.userSubmission.findMany({
+        orderBy: [{ score: "desc" }, { createdAt: "asc" }],
+        take: 5,
+        select: { storeNumber: true, score: true, name: true },
+      }),
+    ]);
 
-  const totalSubmissions = await prisma.userSubmission.count();
-  const averageAggregate = await prisma.userSubmission.aggregate({ _avg: { score: true } });
+    totalSubmissions = await prisma.userSubmission.count();
+    averageAggregate = await prisma.userSubmission.aggregate({ _avg: { score: true } });
+  } catch (error) {
+    if (isPrismaConnectionError(error)) {
+      databaseUnavailable = true;
+    } else {
+      throw error;
+    }
+  }
+
+  if (databaseUnavailable) {
+    return <DatabaseUnavailableState />;
+  }
+
+  if (!quizzes || !submissions || !storeStats || !leaderboardRaw || totalSubmissions === undefined || !averageAggregate) {
+    throw new Error("Admin dashboard data could not be loaded.");
+  }
 
   return (
     <AdminDashboard
