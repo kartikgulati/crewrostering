@@ -19,7 +19,7 @@ type Props = {
 const EMPTY_DOC = {
   type: "doc",
   content: [{ type: "paragraph", content: [{ type: "text", text: "Add launch content here." }] }],
-} as const;
+};
 
 function isEditorDocument(value: Record<string, unknown> | null): value is Record<string, unknown> {
   return !!value && value.type === "doc";
