@@ -38,7 +38,7 @@ npm install
 cp .env.example .env
 ```
 
-3. Set `DATABASE_URL`, `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
+3. Set `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
 
 4. Push the Prisma schema:
 
@@ -79,12 +79,16 @@ node -e "require('bcryptjs').hash(process.argv[1],10).then(console.log)" "YourSt
 2. Configure environment variables from `.env.example`.
 3. Use a PostgreSQL database from Supabase or Neon.
 4. Add Cloudinary credentials if you want direct image uploads.
-5. Run `prisma generate && prisma db push && next build` during deployment or in a pre-deploy migration step.
+5. For Supabase, set `DATABASE_URL` to the pooler connection string and `DIRECT_URL` to the direct database connection string.
+6. Run `prisma generate && prisma db push && next build` during deployment or in a pre-deploy migration step.
 
 ### Database
 
 - Recommended providers: Supabase or Neon
 - Prisma provider is set to `postgresql`
+- For Supabase with Prisma:
+  `DATABASE_URL` should use the Supavisor pooler host.
+  `DIRECT_URL` should use the `db.<project-ref>.supabase.co:5432` direct host for migrations and schema commands.
 
 ### Storage
 

@@ -10,7 +10,7 @@ function DatabaseUnavailableState() {
       <div className="rounded-[32px] border border-amber-200 bg-white p-8 text-center shadow-sm">
         <h1 className="text-3xl font-semibold text-slate-900">Database Unavailable</h1>
         <p className="mt-3 text-sm text-slate-500">
-          The application cannot reach the database right now. Verify the Supabase database is online and that
+          The application cannot reach the database right now. Verify the PostgreSQL database is online and that
           <code> DATABASE_URL </code>
           is correct for this environment.
         </p>
@@ -30,7 +30,7 @@ export default async function LaunchPage({
         <div className="rounded-[32px] border border-amber-200 bg-white p-8 text-center shadow-sm">
           <h1 className="text-3xl font-semibold text-slate-900">Database Setup Required</h1>
           <p className="mt-3 text-sm text-slate-500">
-            Set <code>DATABASE_URL</code> in your environment, then run <code>npm run db:push</code> and <code>npm run seed</code>.
+            Set <code>DATABASE_URL</code> and <code>DIRECT_URL</code> in your environment, then run <code>npm run db:push</code> and <code>npm run seed</code>.
           </p>
         </div>
       </div>
