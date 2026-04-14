@@ -1,5 +1,5 @@
 import { ActiveLaunchPage } from "@/components/crew/active-launch-page";
-import { hasDatabaseUrl, isPrismaConnectionError } from "@/lib/prisma";
+import { hasDatabaseUrl, isPrismaConnectionError, logPrismaConnectionError } from "@/lib/prisma";
 import { getActiveQuiz, getQuizById } from "@/lib/quiz";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +46,7 @@ export default async function LaunchPage({
     quiz = quizId ? await getQuizById(quizId) : await getActiveQuiz();
   } catch (error) {
     if (isPrismaConnectionError(error)) {
+      logPrismaConnectionError(error, "app/launch/page");
       databaseUnavailable = true;
     } else {
       throw error;

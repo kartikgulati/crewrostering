@@ -1,5 +1,5 @@
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
-import { hasDatabaseUrl, isPrismaConnectionError, prisma } from "@/lib/prisma";
+import { hasDatabaseUrl, isPrismaConnectionError, logPrismaConnectionError, prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -76,6 +76,7 @@ export default async function AdminPage() {
     averageAggregate = await prisma.userSubmission.aggregate({ _avg: { score: true } });
   } catch (error) {
     if (isPrismaConnectionError(error)) {
+      logPrismaConnectionError(error, "app/admin/page");
       databaseUnavailable = true;
     } else {
       throw error;
