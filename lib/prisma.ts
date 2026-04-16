@@ -6,6 +6,8 @@ declare global {
 
 export const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
 
+console.log("DB URL:", process.env.DATABASE_URL);
+
 export const prisma =
   hasDatabaseUrl
     ? global.prisma ??
