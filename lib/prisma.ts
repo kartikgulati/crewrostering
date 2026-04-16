@@ -6,8 +6,6 @@ declare global {
 
 export const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
 
-console.log("DB URL:", process.env.DATABASE_URL);
-
 export const prisma =
   hasDatabaseUrl
     ? global.prisma ??
@@ -23,7 +21,16 @@ export function isPrismaConnectionError(error: unknown) {
     return true;
   }
 
-  return error instanceof Error && error.message.includes("Can't reach database server");
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return [
+    "Can't reach database server",
+    "Error querying the database",
+    "Tenant or user not found",
+    "authentication failed",
+  ].some((message) => error.message.includes(message));
 }
 
 function getDatabaseHost() {
