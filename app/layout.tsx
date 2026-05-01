@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Crew Launch Verification",
-  description: "Manage product launch engagement and crew verification in quick-service restaurants.",
+  title: "CrewRostering | Realtime Operations Intelligence",
+  description: "Coordinate live operations with fast, reliable, AI-assisted interaction workflows.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
