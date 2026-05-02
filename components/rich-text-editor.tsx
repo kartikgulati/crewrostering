@@ -38,7 +38,7 @@ export function RichTextEditor({ value, onChange }: Props) {
     content,
     editorProps: {
       attributes: {
-        class: "ProseMirror min-h-[240px] rounded-b-[24px] px-4 py-4 outline-none",
+        class: "ProseMirror min-h-[240px] px-4 py-4 outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/20",
       },
     },
     onUpdate: ({ editor: instance }) => {
@@ -139,7 +139,7 @@ export function RichTextEditor({ value, onChange }: Props) {
   }
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-4 py-3">
         <Button type="button" size="sm" variant="secondary" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>
           <Type className="mr-1 size-4" /> Heading
@@ -161,7 +161,7 @@ export function RichTextEditor({ value, onChange }: Props) {
             placeholder="Paste image URL"
             disabled={uploading}
           />
-          <label className="flex-shrink-0 inline-flex cursor-pointer items-center justify-center rounded-2xl border border-slate-300 px-6 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+          <label className="inline-flex flex-shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-300 px-6 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-within:ring-2 focus-within:ring-cyan-500 focus-within:ring-offset-2">
             {uploading ? "Uploading..." : "Upload file"}
             <input
               type="file"
@@ -176,13 +176,13 @@ export function RichTextEditor({ value, onChange }: Props) {
               }}
             />
           </label>
-          <Button 
+          <Button
             type="button"
             size="sm"
             variant="outline"
             disabled={uploading}
             onClick={addImageFromUrl}
-            className=" flex-shrink-0 py-5  "
+            className="flex-shrink-0 py-5"
           >
             <ImagePlus className="mr-1 size-6" /> Add image
           </Button>

@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-700">Secure Admin Access</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-700">Secure Admin Access</p>
         <h1 className="mt-3 text-3xl font-semibold text-slate-900">Launch Management Login</h1>
         <p className="mt-2 text-sm text-slate-500">Use the admin credentials configured in your environment variables.</p>
         <div className="mt-6 space-y-4">

@@ -174,7 +174,7 @@ export function QuizBuilder({
           <Card className="p-5" key={`question-${index}`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-700">Question {index + 1}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-700">Question {index + 1}</p>
               </div>
               {questions.length > 1 ? (
                 <Button type="button" variant="ghost" size="sm" onClick={() => setQuestions((current) => current.filter((_, itemIndex) => itemIndex !== index))}>

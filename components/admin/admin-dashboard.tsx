@@ -165,10 +165,10 @@ export function AdminDashboard({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <div className="rounded-[32px] bg-[linear-gradient(135deg,_#1e293b,_#0f172a)] p-6 text-white">
+      <div className="rounded-lg bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.16)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <Badge className="bg-white/15 text-white">Admin Panel</Badge>
+            <Badge className="border-white/10 bg-white/[0.08] text-cyan-100">Admin Panel</Badge>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
               Create launch quizes, keep exactly one quiz active, review completion rates, and export store-level reports.
@@ -203,19 +203,19 @@ export function AdminDashboard({
         <div className="mt-6 space-y-6">
           <Card className="p-5">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-[24px] bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Total quizzes</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-950">{quizzes.length}</p>
               </div>
-              <div className="rounded-[24px] bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Total submissions</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.totalSubmissions}</p>
               </div>
-              <div className="rounded-[24px] bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Average score</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-950">{analytics.averageScore}%</p>
               </div>
-              <div className="rounded-[24px] bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-4">
                 <p className="flex items-center gap-2 text-sm text-slate-500">
                   <BarChart3 className="size-4" /> Stores tracked
                 </p>
@@ -251,7 +251,7 @@ export function AdminDashboard({
               </div>
               <div className="mt-4 space-y-3">
                 {quizzes.map((quiz) => (
-                  <div key={quiz.id} className="rounded-[24px] border border-slate-200 p-4">
+                  <div key={quiz.id} className="rounded-lg border border-slate-200 p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
@@ -293,19 +293,19 @@ export function AdminDashboard({
             <Card className="p-5">
               <h2 className="text-lg font-semibold text-slate-900">Top Store Performance</h2>
               <div className="mt-4 space-y-3">
-                <div className="rounded-[24px] bg-slate-50 p-4">
+                <div className="rounded-lg bg-slate-50 p-4">
                   <p className="flex items-center gap-2 text-sm text-slate-500">
                     <Trophy className="size-4" /> Leading store
                   </p>
                   <p className="mt-2 text-lg font-semibold text-slate-950">{analytics.leaderboard[0]?.storeNumber ?? "No data"}</p>
                 </div>
                 {analytics.leaderboard.map((entry, index) => (
-                  <div key={`${entry.storeNumber}-${entry.name}-${index}`} className="flex items-center justify-between rounded-[20px] bg-slate-50 px-4 py-3">
+                  <div key={`${entry.storeNumber}-${entry.name}-${index}`} className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3">
                     <div>
                       <p className="font-medium text-slate-900">{entry.name}</p>
                       <p className="text-sm text-slate-500">Store {entry.storeNumber}</p>
                     </div>
-                    <p className="text-lg font-semibold text-amber-700">{entry.score}%</p>
+                    <p className="text-lg font-semibold text-cyan-700">{entry.score}%</p>
                   </div>
                 ))}
               </div>
@@ -341,7 +341,7 @@ export function AdminDashboard({
             </div>
             <div className="mt-4 space-y-3">
               {quizzes.map((quiz) => (
-                <div key={quiz.id} className="rounded-[24px] border border-slate-200 p-4">
+                <div key={quiz.id} className="rounded-lg border border-slate-200 p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
@@ -385,7 +385,7 @@ export function AdminDashboard({
               <select
                 value={filters.quizId}
                 onChange={(event) => setFilters((current) => ({ ...current, quizId: event.target.value }))}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                className="flex h-11 w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
               >
                 <option value="">All quizzes</option>
                 {quizzes.map((quiz) => (
@@ -440,7 +440,7 @@ export function AdminDashboard({
                       <TD>{formatDate(submission.createdAt, "MMM d, yyyy h:mm a")}</TD>
                       <TD>
                         <Button
-                          className="bg-amber-500"
+                          className="bg-red-50 text-red-700 hover:bg-red-100"
                           type="button"
                           variant="ghost"
                           size="sm"

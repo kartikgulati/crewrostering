@@ -2,10 +2,14 @@
 
 :root {
   color-scheme: light;
+  --app-background: #f8fafc;
+  --app-foreground: #0f172a;
+  --app-accent: #06b6d4;
 }
 
 body {
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--app-background);
+  color: var(--app-foreground);
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
 }

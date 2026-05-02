@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Clock3, ShieldCheck } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -124,8 +122,8 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6">
-      <div className="rounded-[32px] bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.25),_transparent_32%),linear-gradient(135deg,_#0f172a,_#1e293b)] p-6 text-white shadow-xl">
-        <Badge className="bg-white/15 text-white">Active Launch</Badge>
+      <div className="rounded-lg bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.16)]">
+        <Badge className="border-white/10 bg-white/[0.08] text-cyan-100">Active Launch</Badge>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{quiz.title}</h1>
         <p className="mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">{quiz.description}</p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-200">
@@ -178,7 +176,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
               />
             </div>
             <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-green-500">
+              <p className="text-sm font-medium text-emerald-600">
                 {hasViewedContent ? "Content fully viewed" : "Scroll to the bottom to unlock the quiz"}
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -251,8 +249,8 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
 
           <div className="mt-6 space-y-5">
             {quiz.questions.map((question, index) => (
-              <div key={question.id} className="rounded-[24px] border border-slate-200 p-4">
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-700">Question {index + 1}</p>
+              <div key={question.id} className="rounded-lg border border-slate-200 p-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-700">Question {index + 1}</p>
                 <h3 className="mt-2 text-base font-semibold text-slate-900">{question.questionText}</h3>
                 <div className="mt-4 grid gap-3">
                   {question.options.map((option, optionIndex) => {
@@ -262,8 +260,8 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
                         key={`${question.id}-${optionIndex}`}
                         type="button"
                         aria-pressed={selected}
-                        className={`rounded-2xl border px-4 py-3 text-left text-sm transition ${
-                          selected ? "border-amber-500 bg-amber-50 text-slate-950" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                        className={`rounded-lg border px-4 py-3 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 ${
+                          selected ? "border-cyan-500 bg-cyan-50 text-slate-950" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                         }`}
                         onClick={() => setAnswers((current) => ({ ...current, [question.id]: optionIndex }))}
                       >
@@ -295,7 +293,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
           <p className="mt-2 text-sm text-slate-500">Your answers have been saved. Review the result below before closing.</p>
           <div className="mt-6 space-y-4">
             {result.evaluated.map((item, index) => (
-              <div key={item.questionId} className="rounded-[24px] border border-slate-200 p-4">
+              <div key={item.questionId} className="rounded-lg border border-slate-200 p-4">
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Question {index + 1}</p>
                 <h3 className="mt-2 text-base font-semibold text-slate-900">{item.questionText}</h3>
                 <p className="mt-3 text-sm text-slate-600">

@@ -6,9 +6,9 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = {
-  default: "bg-amber-500 text-slate-950 hover:bg-amber-400",
+  default: "bg-slate-950 text-white hover:bg-slate-800",
   secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-  outline: "border border-slate-300 text-slate-900 hover:bg-slate-50",
+  outline: "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
   destructive: "bg-red-600 text-white hover:bg-red-500",
   ghost: "text-slate-700 hover:bg-slate-100",
 };
@@ -31,7 +31,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(
-          "inline-flex items-center justify-center rounded-2xl font-medium transition disabled:cursor-not-allowed disabled:opacity-50",
+          "inline-flex items-center justify-center rounded-lg font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           buttonVariants[variant],
           sizes[size],
           className,
