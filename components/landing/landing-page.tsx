@@ -28,7 +28,7 @@ const stagger: Variants = {
   },
 };
 
-const trustSignals = ["99.99% uptime", "Sub-second sync", "SOC 2-ready controls", "Live ops scale"];
+const trustSignals = ["99.99% uptime", "Sub-second sync", "Verification ready controls", "Live ops scale"];
 
 const features = [
   {
@@ -56,17 +56,17 @@ const features = [
 const steps = [
   {
     label: "01",
-    title: "Connect the workflow",
+    title: "Make digital Roster with tools",
     description: "Bring live inputs, teams, and operational rules into one focused command surface.",
   },
   {
     label: "02",
-    title: "Coordinate in real time",
+    title: "Include real-time data and knowledge questions",
     description: "Track changing conditions and trigger guided actions the moment they matter.",
   },
   {
     label: "03",
-    title: "Improve every run",
+    title: "Release the roster and monitor outcomes",
     description: "Review outcomes, spot patterns, and refine the next interaction with clear performance data.",
   },
 ];
@@ -107,7 +107,7 @@ function ProductPreview() {
   const streams = [
     { label: "Response latency", value: "124ms", trend: "-18%" },
     { label: "Active interactions", value: "8,492", trend: "+32%" },
-    { label: "Decision confidence", value: "96.4%", trend: "+7%" },
+    { label: "Completions", value: "99.99%", trend: "+7%" },
   ];
 
   return (
@@ -129,7 +129,7 @@ function ProductPreview() {
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-slate-500">Interaction engine</p>
-              <h3 className="mt-1 text-xl font-semibold text-slate-950">Realtime coordination</h3>
+              <h3 className="mt-1 text-xl font-semibold text-slate-950">Realtime Crew Rostering</h3>
             </div>
             <div className="rounded-lg border border-cyan-100 bg-cyan-50 px-3 py-2 text-right">
               <p className="text-xs font-medium text-cyan-700">Health</p>
@@ -224,11 +224,10 @@ export function LandingPage() {
           <motion.div variants={fadeUp}>
             <SectionLabel>Realtime intelligence</SectionLabel>
             <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-              Coordinate live operations with AI-speed precision.
+              Coordinate crew rostering and new launches with speed & precision.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              A high-performance interaction layer for teams that need instant signal, reliable execution, and clear
-              decisions when the system is moving fast.
+              A high-performance interaction layer for teams that need reliable system for managing crew rosters.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="rounded-lg bg-slate-950 text-white hover:bg-slate-800">
@@ -266,7 +265,7 @@ export function LandingPage() {
       <AnimatedSection id="features" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
         <motion.div variants={fadeUp} className="max-w-2xl">
           <SectionLabel>Outcomes</SectionLabel>
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Built for fast-moving teams.</h2>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Built confidently for fast-moving teams.</h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
             Every feature is shaped around faster response, better judgment, and dependable live execution.
           </p>
@@ -290,7 +289,7 @@ export function LandingPage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} className="max-w-2xl">
             <SectionLabel>How it works</SectionLabel>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">From signal to action in three steps.</h2>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">From new product to action in three steps.</h2>
           </motion.div>
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {steps.map((step) => (
