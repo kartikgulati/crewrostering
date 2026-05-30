@@ -28,7 +28,7 @@ const stagger: Variants = {
   },
 };
 
-const trustSignals = ["99.99% uptime", "Sub-second sync", "Verification ready controls", "Live ops scale"];
+const trustSignals = ["99.99% uptime", "Sub-second sync", "Verification ready controls", "Real-time analytics"];
 
 const features = [
   {
@@ -37,8 +37,8 @@ const features = [
     icon: Gauge,
   },
   {
-    title: "Make smarter calls",
-    description: "Surface the right signal at the right moment so teams can act with confidence under pressure.",
+    title: "Make critical quizes actionable",
+    description: "Better quize implementaion for deeper understanding",
     icon: Sparkles,
   },
   {
@@ -47,7 +47,7 @@ const features = [
     icon: LockKeyhole,
   },
   {
-    title: "Scale without clutter",
+    title: "Multiple rosters, sessions, and workflows",
     description: "Add more teams, sessions, and workflows while keeping the experience focused and fast.",
     icon: Network,
   },
@@ -56,18 +56,18 @@ const features = [
 const steps = [
   {
     label: "01",
-    title: "Make digital Roster with tools",
-    description: "Bring live inputs, teams, and operational rules into one focused command surface.",
+    title: "Make digital Roster with smart tools",
+    description: "Digitize your crew roster and operational workflows with built-in tools for real-time coordination and execution.",
   },
   {
     label: "02",
     title: "Include real-time data and knowledge questions",
-    description: "Track changing conditions and trigger guided actions the moment they matter.",
+    description: "Enrich your roster with live data and interactive quizzes to keep teams informed, engaged, and ready for action.",
   },
   {
     label: "03",
     title: "Release the roster and monitor outcomes",
-    description: "Review outcomes, spot patterns, and refine the next interaction with clear performance data.",
+    description: "Release the roster and get real-time feedback on outcomes.",
   },
 ];
 
@@ -224,7 +224,7 @@ export function LandingPage() {
           <motion.div variants={fadeUp}>
             <SectionLabel>Realtime intelligence</SectionLabel>
             <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-              Coordinate crew rostering and new launches with speed & precision.
+              Coordinate crew rostering with speed & precision.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
               A high-performance interaction layer for teams that need reliable system for managing crew rosters.
@@ -265,7 +265,7 @@ export function LandingPage() {
       <AnimatedSection id="features" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
         <motion.div variants={fadeUp} className="max-w-2xl">
           <SectionLabel>Outcomes</SectionLabel>
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Built confidently for fast-moving teams.</h2>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Built rosters for fast-moving teams.</h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
             Every feature is shaped around faster response, better judgment, and dependable live execution.
           </p>
@@ -289,7 +289,7 @@ export function LandingPage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} className="max-w-2xl">
             <SectionLabel>How it works</SectionLabel>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">From new product to action in three steps.</h2>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">From idea to action in three steps.</h2>
           </motion.div>
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {steps.map((step) => (
@@ -311,9 +311,9 @@ export function LandingPage() {
         <motion.div variants={fadeUp} className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl">
             <SectionLabel>Product preview</SectionLabel>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">A calm surface for complex moments.</h2>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Easy to use for fast-moving teams .</h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              Dense operational data stays readable, responsive, and ready for repeated daily use.
+             Faster implementation and execution provide teams with learning they need to succeed.
             </p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">
@@ -321,7 +321,8 @@ export function LandingPage() {
           </div>
         </motion.div>
         <motion.div variants={fadeUp}>
-          <ProductPreview />
+          {/* <ProductPreview /> */}
+          todo: add product preview video or gif here 
         </motion.div>
       </AnimatedSection>
 
@@ -330,7 +331,7 @@ export function LandingPage() {
           <div className="max-w-2xl">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Launch a faster live experience today.</h2>
             <p className="mt-4 text-lg leading-8 text-slate-300">
-              Give teams one reliable place to understand what is happening and act before momentum is lost.
+              Give teams one reliable place to understand what is happening.
             </p>
           </div>
           <Button asChild size="lg" className="mt-8 rounded-lg bg-cyan-400 text-slate-950 hover:bg-cyan-300 lg:mt-0">
