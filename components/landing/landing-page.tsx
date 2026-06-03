@@ -56,7 +56,7 @@ const features = [
 const steps = [
   {
     label: "01",
-    title: "Make digital Roster with smart tools",
+    title: "Make digital Roster with smart tools.",
     description: "Digitize your crew roster and operational workflows with built-in tools for real-time coordination and execution.",
   },
   {
