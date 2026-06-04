@@ -48,7 +48,7 @@ const features = [
   },
   {
     title: "Multiple rosters, sessions, and workflows",
-    description: "Add more teams, sessions, and workflows while keeping the experience focused and fast.",
+    description: "Add more teams, sessions, and workflows while keeping the experience focused and effective.",
     icon: Network,
   },
 ];
