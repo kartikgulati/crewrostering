@@ -11,7 +11,7 @@ type SubmissionRow = {
   createdAt: Date;
 };
 
-const PDF_FONT_PATH = path.join(process.cwd(), "node_modules/next/dist/compiled/@vercel/og/noto-sans-v27-latin-regular.ttf");
+const PDF_FONT_PATH = path.join(process.cwd(), "lib/fonts/NotoSans-Regular.ttf");
 
 export async function buildSubmissionPdf(rows: SubmissionRow[]) {
   const doc = new PDFDocument({ margin: 40, size: "A4", font: PDF_FONT_PATH });

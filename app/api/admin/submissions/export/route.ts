@@ -63,7 +63,10 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Failed to export submissions PDF", error);
+    console.error("Failed to export submissions PDF", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return new Response("Unable to export PDF.", { status: 500 });
   }
 }
