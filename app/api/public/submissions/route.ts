@@ -15,6 +15,7 @@ export async function GET(request: Request) {
   const parsed = submissionLookupSchema.safeParse({
     name: searchParams.get("name"),
     storeNumber: searchParams.get("storeNumber"),
+    quizId: searchParams.get("quizId"),
   });
 
   if (!parsed.success) {
@@ -22,12 +23,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const existingSubmission = await prisma.userSubmission.findUnique({
+    const existingSubmission = await prisma.userSubmission.findFirst({
       where: {
-        name_storeNumber: {
-          name: parsed.data.name.trim(),
-          storeNumber: parsed.data.storeNumber.trim(),
-        },
+        name: parsed.data.name.trim(),
+        storeNumber: parsed.data.storeNumber.trim(),
+        quizId: parsed.data.quizId,
       },
       select: {
         id: true,
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(
-        { error: "A submission already exists for this crew member and store number." },
+        { error: "A submission already exists for this crew member, store number, and quiz." },
         { status: 409 },
       );
     }

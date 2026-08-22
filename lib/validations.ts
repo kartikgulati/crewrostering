@@ -35,6 +35,7 @@ export const submissionSchema = z.object({
 export const submissionLookupSchema = z.object({
   name: z.string().min(2).max(120),
   storeNumber: z.string().min(1).max(20),
+  quizId: z.string().min(1),
 });
 
 export const submissionFiltersSchema = z.object({

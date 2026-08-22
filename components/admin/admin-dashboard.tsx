@@ -106,9 +106,16 @@ export function AdminDashboard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  async function activateQuiz(id: string) {
-    await fetch(`/api/admin/quizzes/${id}/activate`, { method: "POST" });
-    refresh();
+  async function toggleQuizActive(id: string) {
+    const response = await fetch(`/api/admin/quizzes/${id}/activate`, { method: "POST" });
+    if (!response.ok) {
+      await refresh();
+      return;
+    }
+    const data = (await response.json()) as { isActive?: boolean };
+    setQuizzes((current) =>
+      current.map((quiz) => (quiz.id === id ? { ...quiz, isActive: data.isActive ?? !quiz.isActive } : quiz)),
+    );
   }
 
   async function deleteQuiz(id: string) {
@@ -171,7 +178,7 @@ export function AdminDashboard({
             <Badge className="border-white/10 bg-white/[0.08] text-cyan-100">Admin Panel</Badge>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
-              Create launch quizes, keep exactly one quiz active, review completion rates, and export store-level reports.
+              Create launch quizes, choose which quizzes are available to crew, review completion rates, and export store-level reports.
             </p>
           </div>
           <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10" onClick={() => signOut({ callbackUrl: "/admin/login" })}>
@@ -278,8 +285,13 @@ export function AdminDashboard({
                       >
                         Edit
                       </Button>
-                      <Button type="button" variant="outline" size="sm" onClick={() => activateQuiz(quiz.id)}>
-                        Set active
+                      <Button
+                        type="button"
+                        variant={quiz.isActive ? "secondary" : "outline"}
+                        size="sm"
+                        onClick={() => toggleQuizActive(quiz.id)}
+                      >
+                        {quiz.isActive ? "Deactivate" : "Activate"}
                       </Button>
                       <Button type="button" variant="ghost" size="sm" onClick={() => deleteQuiz(quiz.id)}>
                         Delete

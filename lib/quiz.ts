@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { percent } from "@/lib/utils";
 
-export async function getActiveQuiz() {
-  if (!prisma) return null;
+export async function getActiveQuizzes() {
+  if (!prisma) return [];
 
-  return prisma.quiz.findFirst({
+  return prisma.quiz.findMany({
     where: { isActive: true },
+    orderBy: { createdAt: "desc" },
     include: {
       questions: {
         orderBy: { order: "asc" },

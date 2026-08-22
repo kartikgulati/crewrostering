@@ -202,6 +202,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
                     const query = new URLSearchParams({
                       name: values.name.trim(),
                       storeNumber: values.storeNumber.trim(),
+                      quizId: quiz.id,
                     });
                     const existingResponse = await fetch(`/api/public/submissions?${query.toString()}`);
                     const existingData = await existingResponse.json();
@@ -212,7 +213,7 @@ export function ActiveLaunchPage({ quiz }: { quiz: ActiveQuizPayload }) {
                     }
 
                     if (existingData.exists) {
-                      setError("A submission already exists for this name, store number. The quiz cannot be started again.");
+                      setError("A submission already exists for this name, store number, and quiz. The quiz cannot be started again.");
                       return;
                     }
 

@@ -14,10 +14,14 @@ export async function POST(_request: Request, context: Context) {
   if (!prisma) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
 
   const { id } = await context.params;
-  await prisma.$transaction([
-    prisma.quiz.updateMany({ data: { isActive: false } }),
-    prisma.quiz.update({ where: { id }, data: { isActive: true } }),
-  ]);
+  const quiz = await prisma.quiz.findUnique({ where: { id }, select: { isActive: true } });
+  if (!quiz) return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
 
-  return NextResponse.json({ ok: true });
+  const updated = await prisma.quiz.update({
+    where: { id },
+    data: { isActive: !quiz.isActive },
+    select: { isActive: true },
+  });
+
+  return NextResponse.json({ ok: true, isActive: updated.isActive });
 }

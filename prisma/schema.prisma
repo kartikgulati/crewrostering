@@ -45,7 +45,7 @@ model UserSubmission {
   createdAt       DateTime @default(now())
   quiz            Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
-  @@unique([name, storeNumber])
+  @@unique([name, storeNumber, quizId])
   @@index([storeNumber, submissionDate])
   @@index([quizId, createdAt])
 }

@@ -1,18 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { isPrismaConnectionError } from "@/lib/prisma";
-import { getActiveQuiz } from "@/lib/quiz";
+import { getActiveQuizzes } from "@/lib/quiz";
 
 export async function GET() {
   try {
-    const quiz = await getActiveQuiz();
-
-    if (!quiz) {
-      return NextResponse.json({ quiz: null });
-    }
+    const quizzes = await getActiveQuizzes();
 
     return NextResponse.json({
-      quiz: {
+      quizzes: quizzes.map((quiz) => ({
         ...quiz,
         questions: quiz.questions.map((question) => ({
           id: question.id,
@@ -20,7 +16,7 @@ export async function GET() {
           options: question.options,
           explanation: question.explanation,
         })),
-      },
+      })),
     });
   } catch (error) {
     if (isPrismaConnectionError(error)) {
