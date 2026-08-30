@@ -68,7 +68,7 @@ export async function buildSubmissionPdf(rows: SubmissionRow[]) {
     return completed;
   }
 
-  const drawHeader = () => {
+  const drawHeader =  () => {
     const top = doc.y;
     doc
       .roundedRect(doc.page.margins.left, top, pageWidth, 28, 8)
