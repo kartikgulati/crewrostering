@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Navbar } from "./navbar";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -198,28 +199,7 @@ export function LandingPage() {
   return (
     <main className="min-h-screen bg-[#030712] text-slate-300 selection:bg-indigo-500/30">
       <div className="mx-auto flex w-full max-w-7xl flex-col px-5 py-5 sm:px-6 lg:px-8">
-        <nav className="flex items-center justify-between py-4">
-          <Link href="/" className="flex items-center gap-2 text-sm font-bold tracking-tight text-white">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
-              <Activity className="h-4 w-4" />
-            </span>
-            CrewRostering
-          </Link>
-          <div className="hidden items-center gap-8 text-xs font-bold uppercase tracking-widest text-slate-400 md:flex">
-            <a href="#features" className="transition hover:text-white">
-              Features
-            </a>
-            <a href="#workflow" className="transition hover:text-white">
-              Workflow
-            </a>
-            <a href="#preview" className="transition hover:text-white">
-              Preview
-            </a>
-          </div>
-          <Button asChild variant="outline" size="sm" className="rounded-full border-white/10 bg-white/5 text-white hover:bg-white/10 backdrop-blur-sm">
-            <Link href="/launch">Open App</Link>
-          </Button>
-        </nav>
+        <Navbar />
 
         <motion.section
           className="grid items-center gap-16 pb-24 pt-20 md:pt-32 lg:grid-cols-[0.95fr_1.05fr] lg:pb-32"
