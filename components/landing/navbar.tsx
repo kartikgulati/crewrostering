@@ -40,7 +40,7 @@ export function Navbar() {
         className={cn(
           "mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-5 transition-all duration-300 sm:px-6 md:grid-cols-[1fr_auto_1fr] lg:px-8",
           isScrolled
-            ? "rounded-none border-b border-white/10 bg-[#030712]/82 py-3 shadow-lg shadow-black/20 backdrop-blur-xl md:rounded-full md:border md:px-5"
+            ? "rounded-none border-b border-[#111412]/10 bg-white/70 py-3 shadow-lg shadow-black/5 backdrop-blur-xl md:rounded-full md:border md:px-5"
             : "bg-transparent py-0",
         )}
       >
@@ -52,7 +52,7 @@ export function Navbar() {
           <div
             className={cn(
               "grid h-9 w-9 place-items-center rounded-xl text-white shadow-lg transition duration-200 group-hover:-translate-y-0.5 group-hover:scale-105",
-              isScrolled ? "bg-indigo-600 shadow-indigo-500/20" : "bg-[#111412] shadow-black/15",
+              isScrolled ? "bg-[#111412] shadow-black/15" : "bg-[#111412] shadow-black/15",
             )}
           >
             <Activity className="h-4 w-4" />
@@ -60,7 +60,7 @@ export function Navbar() {
           <span
             className={cn(
               "text-lg font-black tracking-tight transition-colors",
-              isScrolled ? "text-white" : "text-[#111412]",
+              isScrolled ? "text-black" : "text-[#111412]",
             )}
           >
             CrewRostering
@@ -83,7 +83,7 @@ export function Navbar() {
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-bold transition duration-200 hover:-translate-y-0.5",
                 isScrolled
-                  ? "text-slate-300 hover:bg-white/10 hover:text-white"
+                  ? "text-[#4d5549] hover:bg-white hover:text-[#111412]"
                   : "text-[#4d5549] hover:bg-white hover:text-[#111412]",
               )}
             >
