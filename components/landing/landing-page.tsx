@@ -432,7 +432,7 @@ function ProductPreview() {
 function HeroSection() {
   return (
     <motion.section
-      className="grid min-h-screen items-center gap-12 pb-16 pt-28 md:pt-36 lg:grid-cols-[0.86fr_1.14fr] lg:gap-10 lg:pb-20"
+      className="grid min-h-screen items-center gap-12 pb-16 pt-20 md:pt-24 lg:grid-cols-[0.86fr_1.14fr] lg:gap-10 lg:pb-20"
       initial="hidden"
       animate="visible"
       variants={stagger}
@@ -442,7 +442,7 @@ function HeroSection() {
           <span className="h-1.5 w-1.5 rounded-full bg-[#91b832]" />
           Crew operations SaaS
         </div>
-        <h1 className="max-w-5xl text-6xl font-black uppercase leading-[0.86] tracking-normal text-[#111412] sm:text-7xl lg:text-[7.3rem] xl:text-[8.4rem]">
+        <h1 className="max-w-5xl text-6xl font-black uppercase leading-[0.86] tracking-normal text-[#111412] sm:text-7xl lg:text-[7.3rem] xl:text-[6.4rem]">
           Every Shift.
           <span className="block text-[#6f8d23]">Every Rule.</span>
           Under Control.
