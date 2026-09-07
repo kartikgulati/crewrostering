@@ -38,7 +38,12 @@ const stagger: Variants = {
   },
 };
 
-const trustSignals = ["99.99% uptime", "Sub-second sync", "Verification ready", "Real-time analytics"];
+const trustSignals = [
+  { label: "99.99% uptime", icon: ShieldCheck },
+  { label: "Sub-second sync", icon: Clock3 },
+  { label: "Verification ready", icon: ClipboardCheck },
+  { label: "Real-time analytics", icon: Gauge },
+];
 
 const marqueeCapabilities = [
   "REAL-TIME SYNC",
@@ -515,11 +520,12 @@ export function LandingPage() {
           <div className="mx-auto grid max-w-7xl gap-4 px-5 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
             {trustSignals.map((signal) => (
               <motion.div
-                key={signal}
+                key={signal.label}
                 variants={fadeUp}
-                className="rounded-xl border border-[#111412]/10 bg-white/55 px-6 py-4 text-center text-sm font-bold text-[#4d5549] shadow-sm backdrop-blur-sm"
+                className="group flex items-center justify-center gap-3 rounded-2xl border border-[#111412]/10 bg-white/55 px-6 py-4 text-center text-sm font-bold text-[#4d5549] shadow-sm backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-[#91b832]/50 hover:bg-white/80 hover:shadow-md"
               >
-                {signal}
+                <signal.icon className="h-4 w-4 text-[#6f8d23] transition-colors group-hover:text-[#91b832]" />
+                {signal.label}
               </motion.div>
             ))}
           </div>
