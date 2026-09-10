@@ -23,6 +23,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./navbar";
+import { Footer } from "./footer";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -626,6 +627,7 @@ export function LandingPage() {
           </div>
         </section>
       </div>
+      <Footer />
     </main>
   );
 }
