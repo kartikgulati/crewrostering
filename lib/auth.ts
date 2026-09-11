@@ -1,9 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-
-const adminEmail = process.env.ADMIN_EMAIL ?? "admin@example.com";
-const fallbackPassword = process.env.ADMIN_PASSWORD ?? "ChangeThis123!";
+import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -14,38 +12,44 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) return null;
-        if (credentials.email !== adminEmail) return null;
+        if (!credentials?.username || !credentials.password) return null;
 
-        const envHash = process.env.ADMIN_PASSWORD_HASH;
-        const validPassword = envHash
-          ? await bcrypt.compare(credentials.password, envHash)
-          : credentials.password === fallbackPassword;
+        const user = await prisma!.user.findUnique({
+          where: { username: credentials.username },
+        });
 
-        if (!validPassword) return null;
+        if (!user) return null;
+
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) return null;
 
         return {
-          id: "admin",
-          email: adminEmail,
-          name: "Launch Admin",
-          role: "admin",
+          id: user.id,
+          name: user.username,
+          role: user.role,
+          quizLimit: user.quizLimit,
         };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.role = (user as { role?: string }).role ?? "admin";
+      if (user) {
+        token.id = (user as any).id;
+        token.role = (user as any).role;
+        token.quizLimit = (user as any).quizLimit;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.email = token.email;
-        (session.user as { role?: string }).role = token.role as string;
+        (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
+        (session.user as any).quizLimit = token.quizLimit;
       }
       return session;
     },

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BarChart3, Download, ExternalLink, LogOut, Trash2, Trophy } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,7 @@ export function AdminDashboard({
   initialSubmissions: SubmissionRow[];
   initialAnalytics: Analytics;
 }) {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<"dashboard" | "create" | "submissions">("dashboard");
   const [quizzes, setQuizzes] = useState(initialQuizzes);
   const [selectedQuiz, setSelectedQuiz] = useState<QuizRow | null>(initialQuizzes[0] ?? null);
@@ -174,8 +175,13 @@ export function AdminDashboard({
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <div className="rounded-lg bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.16)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <Badge className="border-white/10 bg-white/[0.08] text-cyan-100">Admin Panel</Badge>
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <Badge className="border-white/10 bg-white/[0.08] text-cyan-100">Admin Panel</Badge>
+              <span className="text-sm font-medium text-slate-400">
+                Signed in as <span className="text-white font-bold">{session?.user?.name}</span>
+              </span>
+            </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">Crew Launch Control Center</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
               Create launch quizes, choose which quizzes are available to crew, review completion rates, and export store-level reports.

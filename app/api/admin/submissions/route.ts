@@ -8,14 +8,17 @@ import { endOfDayUtc, startOfDayUtc } from "@/lib/utils";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!prisma) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
+
+  const userId = (session.user as any).id;
+  const role = (session.user as any).role;
 
   const { searchParams } = new URL(request.url);
   const parsed = submissionFiltersSchema.safeParse(Object.fromEntries(searchParams.entries()));
   if (!parsed.success) return NextResponse.json({ error: "Invalid filters." }, { status: 400 });
 
-  const where = {
+  const where: any = {
     ...(parsed.data.storeNumber ? { storeNumber: parsed.data.storeNumber } : {}),
     ...(parsed.data.quizId ? { quizId: parsed.data.quizId } : {}),
     ...(parsed.data.minScore !== undefined ? { score: { gte: parsed.data.minScore } } : {}),
@@ -28,6 +31,11 @@ export async function GET(request: Request) {
         }
       : {}),
   };
+
+  // If not a SUPER_ADMIN, only allow submissions from their own quizzes
+  if (role !== "SUPER_ADMIN") {
+    where.quiz = { adminId: userId };
+  }
 
   const [submissions, total] = await Promise.all([
     prisma.userSubmission.findMany({

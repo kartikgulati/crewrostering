@@ -1,20 +1,27 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function AdminLoginPage() {
+export default function SuperAdminLoginPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "authenticated" && (session?.user as any).role === "SUPER_ADMIN") {
+      router.replace("/super-admin");
+    }
+  }, [session, status, router]);
 
   async function handleLogin() {
     setLoading(true);
@@ -26,20 +33,28 @@ export default function AdminLoginPage() {
     });
 
     if (result?.error) {
-      setError("Invalid admin credentials.");
+      setError("Invalid super admin credentials.");
       setLoading(false);
       return;
     }
 
-    router.push("/admin");
+    router.push("/super-admin");
     router.refresh();
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-slate-500">Checking session...</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-700">Secure Admin Access</p>
-        <h1 className="mt-3 text-3xl font-semibold text-slate-900">Management Login</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-purple-700">Super Admin Access</p>
+        <h1 className="mt-3 text-3xl font-semibold text-slate-900">Root Management Login</h1>
 
         <div className="mt-6 space-y-4">
           <div className="space-y-2">

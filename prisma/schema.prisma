@@ -8,6 +8,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String
+  role        Role     @default(ADMIN)
+  quizLimit   Int      @default(10)
+  quizzes     Quiz[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Quiz {
   id          String           @id @default(cuid())
   title       String
@@ -18,6 +34,8 @@ model Quiz {
   updatedAt   DateTime         @updatedAt
   questions   Question[]
   submissions UserSubmission[]
+  adminId     String
+  admin       User             @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Question {

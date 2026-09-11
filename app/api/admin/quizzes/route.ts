@@ -7,10 +7,14 @@ import { quizSchema } from "@/lib/validations";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!prisma) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
 
+  const role = (session.user as any).role;
+  const userId = (session.user as any).id;
+
   const quizzes = await prisma.quiz.findMany({
+    where: role === "SUPER_ADMIN" ? {} : { adminId: userId },
     include: { questions: { orderBy: { order: "asc" } } },
     orderBy: { createdAt: "desc" },
   });
@@ -31,8 +35,30 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!prisma) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
+
+  const userId = (session.user as any).id;
+  const quizLimit = (session.user as any).quizLimit;
+  const role = (session.user as any).role;
+
+  if (!userId) {
+    return NextResponse.json({ error: "User ID not found in session." }, { status: 401 });
+  }
+
+  // Check if the admin has reached their quiz limit (only for non-SUPER_ADMINs)
+  if (role !== "SUPER_ADMIN") {
+    const quizCount = await prisma.quiz.count({
+      where: { adminId: userId },
+    });
+
+    if (quizLimit && quizCount >= quizLimit) {
+      return NextResponse.json(
+        { error: `You have reached your quiz limit of ${quizLimit} quizzes.` },
+        { status: 403 }
+      );
+    }
+  }
 
   const body = await request.json();
   const parsed = quizSchema.safeParse(body);
@@ -45,6 +71,7 @@ export async function POST(request: Request) {
       title: parsed.data.title,
       description: parsed.data.description,
       content: parsed.data.content,
+      adminId: userId,
       questions: {
         create: parsed.data.questions.map((question) => ({
           questionText: question.questionText,

@@ -111,8 +111,15 @@ export function QuizBuilder({
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      setError(data.error ?? "Unable to save quiz.");
+      const text = await response.text();
+      let errorMessage = "Unable to save quiz.";
+      try {
+        const data = JSON.parse(text);
+        errorMessage = data.error ?? errorMessage;
+      } catch {
+        errorMessage = text || errorMessage;
+      }
+      setError(errorMessage);
       setLoading(false);
       return;
     }
